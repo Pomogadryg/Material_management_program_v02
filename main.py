@@ -1,11 +1,12 @@
 from tkinter import *
 import tkinter as tk
 import sqlite3
+from datetime import date, timedelta
 
 
 
 
-class ExampleFrame(tk.Tk):
+class classMain(tk.Tk):
 	def __init__(self, *args, **kwargs):
 
 		tk.Tk.__init__(self, *args, **kwargs)
@@ -40,6 +41,39 @@ class ExampleFrame(tk.Tk):
 		self.initiate_reag_db()
 
 
+		self.visualization_frame = tk.Frame(main_frame, width=50, height=int(self.winfo_screenheight()))
+		self.visualization_frame.pack(side="right", fill="y")
+
+		# Create a list of calendar dates starting 2 days before today and continuing for 40 days
+		calendar_dates = [date.today() - timedelta(days=2) + timedelta(days=i) for i in range(40)]
+
+		# Create the labels for calendar and position them using the grid method
+		for i in range(1):
+		    for j in range(2,40):
+		        label = tk.Label(self.visualization_frame, text=calendar_dates[j].strftime("%d/%m"))
+		        # label = tk.Label(self.visualization_frame, text=calendar_dates[j].strftime("%d/%m/%Y"))
+		        label.grid(row=i, column=j)
+
+		# Create the buttons for processes and position them using the grid method
+		for i in range(2, 11):
+		    for j in range(2,40):
+		        button = tk.Button(self.visualization_frame, text="Button")
+		        button.grid(row=i, column=j)
+
+		# Create the labels for names for used reagents and position them using the grid method
+		for i in range(11, 34):
+		    for j in range(1):
+		        label = tk.Label(self.visualization_frame, text='PERG')
+		        label.grid(row=i, column=j)
+
+
+		# Create the labels for used reagents and position them using the grid method
+		for i in range(11, 34):
+		    for j in range(2,40):
+		        label = tk.Label(self.visualization_frame, text='reag.')
+		        label.grid(row=i, column=j)
+
+
 	def initiate_reag_db(self):
 		conn=sqlite3.connect("reagents.db")
 		self.cursor=conn.cursor()
@@ -59,7 +93,7 @@ class ExampleFrame(tk.Tk):
 			d_code=d[0]
 			d_amount=d[1]
 			print(d_code,' ', d_amount)
-			self.data_base_text.insert("end", "\n%s | %.2f"%(d_code,d_amount))
+			self.data_base_text.insert("end", "\n%s=%.2f"%(d_code,d_amount))
 		print(self.cursor.fetchall())
 		conn.commit()
 		conn.close()
@@ -84,16 +118,18 @@ class ExampleFrame(tk.Tk):
 
 	def delete_reagent(self):
 		input_text=self.add_entry.get()
+		print(input_text)
 		conn=sqlite3.connect("reagents.db")
 		self.cursor=conn.cursor()
-		self.cursor.execute("DELETE FROM reagent_from_text_widget WHERE WH_code=?",(input_text))
+		self.cursor.execute("DELETE FROM reagent_from_text_widget WHERE WH_code=?",(input_text,))
 		conn.commit()
 		conn.close()
+		self.fill_up_textW_from_db()
 
 
 
-# Create an instance of the ExampleFrame class
-app = ExampleFrame()
+# Create an instance of the classMain class
+app = classMain()
 
 # Run the Tkinter event loop
 
