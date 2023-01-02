@@ -16,6 +16,7 @@ class classMain(tk.Tk):
 		"NaOH", "2-ME", "MeOH", "NaEDTA", "NaCl", "EtOAc", "Et3N", "MsCl","NH4OH", "H20", "MeSNa", "NaClO", "MSA","MeOH_PhEur",  "iPrOH", "Darco" ]
 
 		self.processes={}
+		self.calendar_days={}
 
 		# Set the window title and size
 		self.title("Frame Example")
@@ -60,6 +61,8 @@ class classMain(tk.Tk):
 				self.calendar_label = tk.Label(self.visualization_frame, text=calendar_dates[j].strftime("%d/%m"))
 				# label = tk.Label(self.visualization_frame, text=calendar_dates[j].strftime("%d/%m/%Y"))
 				self.calendar_label.grid(row=i, column=j)
+				self.calendar_days[(i,j)]=calendar_dates[j].strftime("%d/%m")
+				print("calendar: ",i,j,calendar_dates[j].strftime("%d/%m"))
 		
 
 
@@ -114,6 +117,7 @@ class classMain(tk.Tk):
 			if widget.winfo_class() == 'TCombobox' and widget.winfo_name() == '%s'%temp_[-1]:
 				selected_item = widget.get()
 				print(selected_item)
+				print(self.calendar_days[0,col])
 				print(row,col)
 				print(self.calendar_label.get())
 
