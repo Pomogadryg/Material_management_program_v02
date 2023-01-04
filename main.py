@@ -62,7 +62,7 @@ class classMain(tk.Tk):
 				# label = tk.Label(self.visualization_frame, text=calendar_dates[j].strftime("%d/%m/%Y"))
 				self.calendar_label.grid(row=i, column=j)
 				self.calendar_days[(i,j)]=calendar_dates[j].strftime("%d/%m")
-				print("calendar: ",i,j,calendar_dates[j].strftime("%d/%m"))
+				# print("calendar: ",i,j,calendar_dates[j].strftime("%d/%m"))
 		
 
 
@@ -101,16 +101,21 @@ class classMain(tk.Tk):
 	def initiate_process_db(self):
 		conn=sqlite3.connect("process.db")
 		cursor=conn.cursor()
-		cursor.execute("CREATE TABLE IF NOT EXISTS process(day TEXT, stage TEXT, color TEXT)")
+		# cursor.execute("DROP TABLE process") # to delete table
+
+		cursor.execute("CREATE TABLE IF NOT EXISTS process(day TEXT, position TEXT, stage TEXT, color TEXT)")
+
+		cursor.execute("SELECT * FROM process")
+		
+		data=cursor.fetchall()
+		print("data from reagent db: ",data)
 		conn.commit()
 		conn.close()
 
 	def save_process_in_db(self,event, row, col):
-		# conn=sqlite3.connect("process.db")
-		# cursor=conn.cursor()
-		# cursor.execute("INSERT INTO process(WH_code,amount) VALUES(?,?)",(wh_c,am))
-		# conn.commit()
-		# conn.close()
+		conn=sqlite3.connect("process.db")
+		cursor=conn.cursor()
+
 		temp_=str(self.processes[(row,col)]).split(".")		
 		# Find the Combobox widget with the desired name
 		for widget in self.visualization_frame.winfo_children():
@@ -119,7 +124,16 @@ class classMain(tk.Tk):
 				print(selected_item)
 				print(self.calendar_days[0,col])
 				print(row,col)
-				print(self.calendar_label.get())
+				print("---------------------------------")
+
+				cursor.execute("SELECT * FROM process WHERE day=?, position=?",(self.calendar_days[0,col], row))
+				check_match=cursor.fetchone()
+				if check_match:
+					cursor.execute("UPDATE process SET stage=?, color=? WHERE day=?, position=?",(widget.get(), None, self.calendar_days[0,col], row))
+				else:
+					cursor.execute("INSERT INTO process(day, position, stage, color) VALUES(?,?,?,?)",(self.calendar_days[0,col], row, widget.get(), None))
+		conn.commit()
+		conn.close()
 
 
 
