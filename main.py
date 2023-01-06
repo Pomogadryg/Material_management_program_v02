@@ -15,6 +15,8 @@ class classMain(tk.Tk):
 		self.list_of_reagents_fromDB=["PERG SM", "n-PrI", "NMP", "NaHCO3", "CaCl2", "NaBH4", 
 		"NaOH", "2-ME", "MeOH", "NaEDTA", "NaCl", "EtOAc", "Et3N", "MsCl","NH4OH", "H20", "MeSNa", "NaClO", "MSA","MeOH_PhEur",  "iPrOH", "Darco" ]
 
+		self.dic_process_reag={"S.1"}
+
 		self.processes={}
 		self.calendar_days={}
 
@@ -70,8 +72,20 @@ class classMain(tk.Tk):
 		for i in range(2, 11):
 			for j in range(2,40):
 				self.my_list = ttk.Combobox(self.visualization_frame, width=7)
-				self.my_list["values"]=("Stage1","Stage2", "Stage3")
+				self.my_list["values"]=("","S.1_start","S.1","S.2_start", "S.2","S.3_start", "S.3")
+
+
 				self.my_list.grid(row=i, column=j)
+
+				conn=sqlite3.connect("process.db")
+				cursor=conn.cursor()
+				cursor.execute("SELECT * FROM process WHERE day=? AND position=?",(self.calendar_days[0,j], i))
+				check_match=cursor.fetchone()
+				if check_match:
+					# print("checking here: ",check_match[2])
+					self.my_list.set(check_match[2])
+
+
 				self.processes[(i,j)]=self.my_list
 				self.my_list.bind("<<ComboboxSelected>>", lambda event, row=i, col=j: self.save_process_in_db(event, row, col))
 
@@ -112,6 +126,8 @@ class classMain(tk.Tk):
 		conn.commit()
 		conn.close()
 
+		self.fill_up_processW_from_db()
+
 	def save_process_in_db(self,event, row, col):
 		conn=sqlite3.connect("process.db")
 		cursor=conn.cursor()
@@ -121,15 +137,15 @@ class classMain(tk.Tk):
 		for widget in self.visualization_frame.winfo_children():
 			if widget.winfo_class() == 'TCombobox' and widget.winfo_name() == '%s'%temp_[-1]:
 				selected_item = widget.get()
-				print(selected_item)
-				print(self.calendar_days[0,col])
-				print(row,col)
-				print("---------------------------------")
+				# print(selected_item)
+				# print(self.calendar_days[0,col])
+				# print(row,col)
+				# print("---------------------------------")
 
-				cursor.execute("SELECT * FROM process WHERE day=?, position=?",(self.calendar_days[0,col], row))
+				cursor.execute("SELECT * FROM process WHERE day=? AND position=?",(self.calendar_days[0,col], row))
 				check_match=cursor.fetchone()
 				if check_match:
-					cursor.execute("UPDATE process SET stage=?, color=? WHERE day=?, position=?",(widget.get(), None, self.calendar_days[0,col], row))
+					cursor.execute("UPDATE process SET stage=?, color=? WHERE day=? AND position=?",(widget.get(), None, self.calendar_days[0,col], row))
 				else:
 					cursor.execute("INSERT INTO process(day, position, stage, color) VALUES(?,?,?,?)",(self.calendar_days[0,col], row, widget.get(), None))
 		conn.commit()
@@ -151,6 +167,9 @@ class classMain(tk.Tk):
 		print(cursor.fetchall())
 		conn.commit()
 		conn.close()
+
+	def fill_up_processW_from_db(self):
+		pass
 
 	
 	def add_reagent(self):
