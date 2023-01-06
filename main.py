@@ -15,10 +15,14 @@ class classMain(tk.Tk):
 		self.list_of_reagents_fromDB=["PERG SM", "n-PrI", "NMP", "NaHCO3", "CaCl2", "NaBH4", 
 		"NaOH", "2-ME", "MeOH", "NaEDTA", "NaCl", "EtOAc", "Et3N", "MsCl","NH4OH", "H20", "MeSNa", "NaClO", "MSA","MeOH_PhEur",  "iPrOH", "Darco" ]
 
-		self.dic_process_reag={"S.1"}
+		self.sm=7
+		self.dic_process_reag_s1={"PERG SM": self.sm, "n-PrI": 1.63*self.sm, "NMP": 6.15*self.sm, "NaHCO3": 0.932*self.sm, 
+		"CaCl2": 0.53*self.sm, "NaBH4": 0.35*self.sm, "NaOH": 1.11*self.sm, "2-ME": 1.01*self.sm, "NaEDTA": 1.4*self.sm, 
+		"NaCl": 7.65*self.sm}
 
 		self.processes={}
 		self.calendar_days={}
+		self.reagent_consumption={}
 
 		# Set the window title and size
 		self.title("Frame Example")
@@ -100,8 +104,24 @@ class classMain(tk.Tk):
 		# Create the labels for used reagents and position them using the grid method
 		for i in range(11, 11+range_):
 			for j in range(2,40):
-				label = tk.Label(self.visualization_frame, text='reag.')
+				label = tk.Label(self.visualization_frame, text=f"label{i}{j}", name=f"label_{i}_{j}")
 				label.grid(row=i, column=j)
+				label_name=label.winfo_name()
+				label_text=label.cget("text")
+				print(label_name)
+				print(label_text)
+
+
+	def calc_label(self):
+		print(label.cget)
+
+
+
+
+
+
+
+
 
 
 	def initiate_reag_db(self):
